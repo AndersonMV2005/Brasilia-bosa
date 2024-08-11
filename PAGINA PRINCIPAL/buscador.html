@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador en Archivos HTML</title>
+</head>
+<body>
+    <h1>Buscador de Información en Archivos HTML</h1>
+    <input type="text" id="searchQuery" placeholder="Buscar...">
+    <button onclick="search()">Buscar</button>
+    <div id="results"></div>
+
+    <script>
+        // Lista de archivos HTML en los que se va a buscar
+        const files = ['pagina.html', 'pagina2.html', 'pagina3.html'];
+
+        function search() {
+            let query = document.getElementById('searchQuery').value.toLowerCase().trim();
+            let resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = ''; // Limpiar resultados anteriores
+
+            if (query === "") {
+                resultsDiv.innerHTML = 'Por favor, ingresa un término de búsqueda.';
+                return;
+            }
+
+            files.forEach(file => {
+                fetch(file)
+                .then(response => response.text())
+                .then(data => {
+                    if (data.toLowerCase().includes(query)) {
+                        let snippet = getSnippet(data, query);
+                        resultsDiv.innerHTML += `<h3>Resultados en ${file}</h3><p>${snippet}</p><a href="${file}">Ver más</a><hr>`;
+                    }
+                })
+                .catch(error => {
+                    console.error(`Error al cargar ${file}:`, error);
+                });
+            });
+        }
+
+        function getSnippet(data, query) {
+            let startIndex = data.toLowerCase().indexOf(query);
+            let snippet = data.substring(Math.max(0, startIndex - 30), startIndex + 100);
+            return snippet;
+        }
+    </script>
+</body>
+</html>
